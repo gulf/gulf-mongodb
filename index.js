@@ -33,8 +33,7 @@ var Snapshot = module.exports.Snapshot = {
 , id: Number
 }
 
-function Adapter(mongooseConnection, documentId) {
-  this.documentId = documentId
+function Adapter(mongooseConnection) {
   this.Document = mongooseConnection.model('Document', new Schema(Document))
   this.Snapshot = mongooseConnection.model('Snapshot', new Schema(Snapshot))
 }
@@ -45,39 +44,41 @@ Adapter.prototype.createDocument = function(initialSnapshot, cb) {
   document.latestSnapshot = initialSnapshot.id
   document.save(function(er, document) {
     if(er) return cb(er)
-    this.documentId = document._id
-    this.storeSnapshot(initialSnapshot, cb)
+    this.storeSnapshot(initialSnapshot, function(er) {
+      if(er) return cb(er)
+      cb(null, document._id)
+    })
   }.bind(this))
 }
 
-Adapter.prototype.getFirstSnapshot = function(cb) {
-  this.Document.findById(this.documentId, function(er, doc) {
+Adapter.prototype.getFirstSnapshot = function(documentId, cb) {
+  this.Document.findById(documentId, function(er, doc) {
     if(er) return cb(er)
-    this.Snapshot.findById({document: this.documentId, id: doc.firstSnapshot}, function(er, snapshot) {
+    this.Snapshot.findById({document: documentId, id: doc.firstSnapshot}, function(er, snapshot) {
       if(er) return cb(er)
       cb(null, snapshot)
     })
   }.bind(this))
 }
 
-Adapter.prototype.getLatestSnapshot = function(cb) {
-  this.Document.findById(this.documentId, function(er, doc) {
+Adapter.prototype.getLatestSnapshot = function(documentId, cb) {
+  this.Document.findById(documentId, function(er, doc) {
     if(er) return cb(er)
     if(!doc) return cb(new Error('Document '+this.documentId+' not found'))
-    this.Snapshot.findOne({document: this.documentId, id: doc.latestSnapshot}, function(er, snapshot) {
+    this.Snapshot.findOne({document: documentId, id: doc.latestSnapshot}, function(er, snapshot) {
       if(er) return cb(er)
       cb(null, snapshot)
     })
   }.bind(this))
 }
 
-Adapter.prototype.storeSnapshot = function(snapshot, cb) {
+Adapter.prototype.storeSnapshot = function(documentId, snapshot, cb) {
   var snapshotId = snapshot.id
-  snapshot.document = this.documentId
+  snapshot.document = documentId
   snapshot = new this.Snapshot(snapshot)
   snapshot.save(function(er) {
     if(er) return cb(er)
-    this.Document.findById(this.documentId, function(er, doc) {
+    this.Document.findById(documentId, function(er, doc) {
       if(er) return cb(er)
       doc.latestSnapshot = snapshotId
       doc.save(cb)
@@ -85,14 +86,14 @@ Adapter.prototype.storeSnapshot = function(snapshot, cb) {
   }.bind(this))
 }
 
-Adapter.prototype.existsSnapshot = function(editId, cb) {
-  this.Snapshot.findOne({id: editId, document: this.documentId}, function(er, snapshot) {
+Adapter.prototype.existsSnapshot = function(documentId, editId, cb) {
+  this.Snapshot.findOne({id: editId, document: documentId}, function(er, snapshot) {
     cb(null, !!snapshot)
   })
 }
 
-Adapter.prototype.getSnapshotsAfter = function(editId, cb) {
-  this.Snapshot.find({document: this.documentId, id: {$gt: editId}}, function(er, snapshots) {
+Adapter.prototype.getSnapshotsAfter = function(documentId, editId, cb) {
+  this.Snapshot.find({document: documentId, id: {$gt: editId}}, function(er, snapshots) {
     if(er) return cb(er)
     cb(null, snapshots)
   })
