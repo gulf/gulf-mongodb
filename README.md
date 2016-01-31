@@ -32,8 +32,8 @@ var mongoose = require('mongoose')
 var MongoDBAdapter = require('gulf-mongodb')
 
 var dbConnection = mongoose.createConnection('mongodb://localhost/my_database')
-var mongoAdapter = new MongoDBAdapter(dbConnection, 'documentId')
-gulf.Document.load(mongoAdapter, ottype, function(er, doc) {
+var mongoAdapter = new MongoDBAdapter(dbConnection)
+gulf.Document.load(mongoAdapter, ottype, docId, function(er, doc) {
   if(er) throw er
   net.createServer(function(stream) {
     stream.pipe(doc.slaveLink()).pipe(stream)
@@ -44,4 +44,4 @@ gulf.Document.load(mongoAdapter, ottype, function(er, doc) {
 ## Legal
 (c) 2015 by Marcel Klehr
 
-GNU General Public License
+GNU Lesser General Public License
