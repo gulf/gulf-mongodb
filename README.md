@@ -7,6 +7,8 @@
 npm install gulf-mongodb
 ```
 
+(*gulf-mongodb* was written against mongoose@3.x)
+
 ## Usage
 
 ```
