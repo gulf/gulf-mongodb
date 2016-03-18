@@ -44,7 +44,7 @@ Adapter.prototype.createDocument = function(initialSnapshot, cb) {
   document.latestSnapshot = initialSnapshot.id
   document.save(function(er, document) {
     if(er) return cb(er)
-    this.storeSnapshot(initialSnapshot, function(er) {
+    this.storeSnapshot(document._id, initialSnapshot, function(er) {
       if(er) return cb(er)
       cb(null, document._id)
     })
