@@ -93,8 +93,19 @@ Adapter.prototype.existsSnapshot = function(documentId, editId, cb) {
 }
 
 Adapter.prototype.getSnapshotsAfter = function(documentId, editId, cb) {
-  this.Snapshot.find({document: documentId, id: {$gt: editId}}, function(er, snapshots) {
+  var snapshots = []
+  findAfter.call(this, null, {id: editId})
+  function findAfter(er, snapshot) {
     if(er) return cb(er)
-    cb(null, snapshots)
-  })
+    if(!snapshot) return cb(null, snapshots)
+    if(snapshot.id !== editId) snapshots.push(snapshot)
+    findSnapshotAfter.call(this, snapshot.id, findAfter.bind(this))
+  }
+  function findSnapshotAfter(editId, cb) {
+    this.Snapshot.findOne({document: documentId, parent: editId}
+    , function(er, s) {
+      if(er) return cb(er)
+      cb(null, s)
+    })
+  }
 }
