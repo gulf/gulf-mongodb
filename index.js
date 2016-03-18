@@ -21,8 +21,8 @@ var mongoose = require('mongoose')
 module.exports = Adapter
 
 var Document = module.exports.Document = {
-  firstSnapshot: Number
-, latestSnapshot: Number
+  firstSnapshot: String
+, latestSnapshot: String
 }
 
 var Snapshot = module.exports.Snapshot = {
@@ -30,7 +30,7 @@ var Snapshot = module.exports.Snapshot = {
 , creationDate: Date
 , contents: String
 , edit: String
-, id: Number
+, id: String
 }
 
 function Adapter(mongooseConnection) {
