@@ -28,7 +28,7 @@ var Document = module.exports.Document = {
 var Snapshot = module.exports.Snapshot = {
   document: Schema.ObjectId
 , creationDate: Date
-, contents: String
+, contents: Object
 , edit: String
 , id: String
 }
