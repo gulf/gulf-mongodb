@@ -1,6 +1,6 @@
 {
   "name": "gulf-mongodb",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Gulf storage adapter for mongodb",
   "main": "index.js",
   "dependencies": {
