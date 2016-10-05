@@ -1,6 +1,8 @@
 # gulf-mongodb
 [gulf](http://github.com/marcelklehr/gulf#readme) storage adapter for mongodb
 
+Compatible with gulf v4, only. Writing a storage adapter for gulf v5 is super easy and you're much more flxible than taking an opinionated one like this.
+
 ## Install
 
 ```
